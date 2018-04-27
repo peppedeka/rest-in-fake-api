@@ -8,10 +8,11 @@ class FieldModel(models.Model):
     TYPE_OF_FIELD = (
         ('int', 'integer'),
         ('float', 'float'),
-        ('str', 'string')
+        ('str', 'string'),
     )
     name = models.CharField(max_length=100, unique=True, primary_key=True)
-    typefield = models.CharField(max_length=9, choices=TYPE_OF_FIELD, default='string')
+    typefield = models.CharField(
+        max_length=9, choices=TYPE_OF_FIELD, default='string')
     required = models.BooleanField()
     range_start = models.IntegerField()
     range_end = models.IntegerField()
@@ -23,9 +24,22 @@ class FieldModel(models.Model):
         ordering = ('name',)
 
 
+class ObjModel(models.Model):
+    name = models.CharField(max_length=100, unique=True, primary_key=True)
+    field = models.ManyToManyField(FieldModel, verbose_name="list of fields")
+
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ('name',)
+
+
 class ApiModel(models.Model):
     name = models.CharField(max_length=100, unique=True, primary_key=True)
     field = models.ManyToManyField(FieldModel, verbose_name="list of fields")
+    obj = models.ManyToManyField(ObjModel, verbose_name="list of objs")
 
     def __str__(self):
         return self.name

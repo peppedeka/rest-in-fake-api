@@ -8,8 +8,8 @@ from rest_framework import status
 from django.http import JsonResponse
 from random import randint
 
-from .models import ProjectModel, ApiModel, FieldModel
-from .serializer import ProjectSerializer, ApiSerializer, FieldSerializer
+from .models import ProjectModel, ApiModel, FieldModel, ObjModel
+from .serializer import ProjectSerializer, ApiSerializer, FieldSerializer, ObjSerializer
 
 
 class projectList(APIView):
@@ -66,9 +66,11 @@ class apiOfProjectList(APIView):
     serializer_class = ApiSerializer
 
     def get(self, request, pk, format=None):
+
         api = ApiModel.objects.get(name=pk)
         serializer = ApiSerializer(api, many=True)
         field_data = api.field.all()
+        obj_data = api.obj.all()
         jsonResp = {}
         for fld_obj in field_data:
             if fld_obj.typefield == 'int':
@@ -80,6 +82,21 @@ class apiOfProjectList(APIView):
             elif fld_obj.typefield == 'string':
                 jsonResp.update({fld_obj.name: randint(
                     fld_obj.range_start, fld_obj.range_end)})
+
+        for obj in obj_data:
+            jsonFromObj = {}
+            for fld_obj in obj.field.all():
+                if fld_obj.typefield == 'int':
+                    jsonFromObj.update({fld_obj.name: randint(
+                        fld_obj.range_start, fld_obj.range_end)})
+                elif fld_obj.typefield == 'float':
+                    jsonFromObj.update({fld_obj.name: randint(
+                        fld_obj.range_start, fld_obj.range_end)})
+                elif fld_obj.typefield == 'string':
+                    jsonFromObj.update({fld_obj.name: randint(
+                        fld_obj.range_start, fld_obj.range_end)})
+            jsonResp.update({obj.name: jsonFromObj})
+
         return JsonResponse(jsonResp)
 
     def post(self, request, format=None):
@@ -187,4 +204,54 @@ class fieldDetail(APIView):
     def delete(self, request, pk, format=None):
         _field = self.get_object(pk)
         _field.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class objList(APIView):
+    """
+    List all code snippets, or create a new snippet.
+    """
+    serializer_class = ObjSerializer
+
+    def get(self, request, format=None):
+        obj = ObjModel.objects.all()
+        serializer = ObjSerializer(obj, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = ObjSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class objDetail(APIView):
+    """
+    Retrieve, update or delete a code snippet.
+    """
+    serializer_class = ObjSerializer
+
+    def get_object(self, pk):
+        try:
+            return ObjModel.objects.get(pk=pk)
+        except ObjModel.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        _obj = self.get_object(pk)
+        serializer = ObjSerializer(_obj)
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        _obj = self.get_object(pk)
+        serializer = FieldSerializer(_obj, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        _obj = self.get_object(pk)
+        _obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

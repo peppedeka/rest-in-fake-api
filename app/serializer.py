@@ -1,6 +1,12 @@
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
-from .models import ProjectModel, ApiModel, FieldModel
+from .models import ProjectModel, ApiModel, FieldModel, ObjModel
+
+class ObjSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ObjModel
+        fields = '__all__'
+
 
 class FieldSerializer(serializers.ModelSerializer):
     def validate(self, data):
