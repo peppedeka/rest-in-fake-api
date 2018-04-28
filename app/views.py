@@ -31,6 +31,23 @@ class projectList(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class projectVerboseDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return ProjectModel.objects.get(pk=pk)
+        except ProjectModel.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        project = self.get_object(pk)
+        apis = []
+        for api in project.api.all():
+            field = list(api.field.values())
+            objs = list(api.obj.values())
+            apis.append({'api': api.name, 'field': field, 'obj': objs})
+        return JsonResponse({project.name: apis})
+
+
 class projectDetail(APIView):
     """
     Retrieve, update or delete a code snippet.
@@ -45,13 +62,8 @@ class projectDetail(APIView):
 
     def get(self, request, pk, format=None):
         project = self.get_object(pk)
-        apis = []
-        for api in project.api.all():
-            field = list(api.field.values())
-            objs = list(api.obj.values())
-            apis.append({'api': api.name, 'field': field, 'obj': objs})
-
-        return JsonResponse({project.name: apis})
+        serializer = ProjectSerializer(project)
+        return Response(serializer.data)
 
     def put(self, request, pk, format=None):
         project = self.get_object(pk)
@@ -183,9 +195,7 @@ class apiDetail(APIView):
     def get(self, request, pk, format=None):
         api = self.get_object(pk)
         serializer = ApiSerializer(api)
-        field = list(api.field.values())
-        objs = list(api.obj.values())
-        return JsonResponse({'name': api.name, 'fields': field, 'obj': objs})
+        return Response(serializer.data)
 
     def put(self, request, pk, format=None):
         api = self.get_object(pk)

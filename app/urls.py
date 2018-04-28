@@ -7,6 +7,7 @@ from .models import ProjectModel
 urlpatterns = [
     url(r'^project/$', views.projectList.as_view()),
     url(r'^project/(?P<pk>[a-z0-9]+)/$', views.projectDetail.as_view()),
+    url(r'^project-details/(?P<pk>[a-z0-9]+)/$', views.projectVerboseDetail.as_view()),
 ]
 
 projects = ProjectModel.objects.all()
