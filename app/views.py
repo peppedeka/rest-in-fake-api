@@ -78,17 +78,20 @@ class apiOfProjectList(APIView):
                 if fld_obj.typefield == 'int':
                     onetoten = range(0, fld_obj.array_length)
                     for count in onetoten:
-                        arrayValue.append(randint(fld_obj.range_start, fld_obj.range_end))
+                        arrayValue.append(
+                            randint(fld_obj.range_start, fld_obj.range_end))
                     jsonResp.update({fld_obj.name: arrayValue})
                 elif fld_obj.typefield == 'float':
-                    onetoten=range(0, fld_obj.array_length)
+                    onetoten = range(0, fld_obj.array_length)
                     for count in onetoten:
-                        arrayValue.append(randint(fld_obj.range_start, fld_obj.range_end))
+                        arrayValue.append(
+                            randint(fld_obj.range_start, fld_obj.range_end))
                     jsonResp.update({fld_obj.name: arrayValue})
                 elif fld_obj.typefield == 'string':
-                    onetoten=range(0, fld_obj.array_length)
+                    onetoten = range(0, fld_obj.array_length)
                     for count in onetoten:
-                        arrayValue.append(randint(fld_obj.range_start, fld_obj.range_end))
+                        arrayValue.append(
+                            randint(fld_obj.range_start, fld_obj.range_end))
                     jsonResp.update({fld_obj.name: arrayValue})
             elif fld_obj.typefield == 'int':
                 jsonResp.update({fld_obj.name: randint(
@@ -101,23 +104,40 @@ class apiOfProjectList(APIView):
                     fld_obj.range_start, fld_obj.range_end)})
 
         for obj in obj_data:
-            jsonFromObj={}
-            for fld_obj in obj.field.all():
-                if fld_obj.typefield == 'int':
-                    jsonFromObj.update({fld_obj.name: randint(
-                        fld_obj.range_start, fld_obj.range_end)})
-                elif fld_obj.typefield == 'float':
-                    jsonFromObj.update({fld_obj.name: randint(
-                        fld_obj.range_start, fld_obj.range_end)})
-                elif fld_obj.typefield == 'string':
-                    jsonFromObj.update({fld_obj.name: randint(
-                        fld_obj.range_start, fld_obj.range_end)})
-            jsonResp.update({obj.name: jsonFromObj})
+            jsonFromObjArray = []
+            if (obj.array):
+                onetoten = range(0, obj.array_length)
+                for count in onetoten:
+                    jsonFromObj = {}
+                    for fld_obj in obj.field.all():
+                        if fld_obj.typefield == 'int':
+                            jsonFromObj.update({fld_obj.name: randint(
+                                fld_obj.range_start, fld_obj.range_end)})
+                        elif fld_obj.typefield == 'float':
+                            jsonFromObj.update({fld_obj.name: randint(
+                                fld_obj.range_start, fld_obj.range_end)})
+                        elif fld_obj.typefield == 'string':
+                            jsonFromObj.update({fld_obj.name: randint(
+                                fld_obj.range_start, fld_obj.range_end)})
+                    jsonFromObjArray.append(jsonFromObj)
+                jsonResp.update({obj.name: jsonFromObjArray})
+            else:
+                for fld_obj in obj.field.all():
+                    if fld_obj.typefield == 'int':
+                        jsonFromObj.update({fld_obj.name: randint(
+                            fld_obj.range_start, fld_obj.range_end)})
+                    elif fld_obj.typefield == 'float':
+                        jsonFromObj.update({fld_obj.name: randint(
+                            fld_obj.range_start, fld_obj.range_end)})
+                    elif fld_obj.typefield == 'string':
+                        jsonFromObj.update({fld_obj.name: randint(
+                            fld_obj.range_start, fld_obj.range_end)})
+                jsonResp.update({obj.name: jsonFromObj})
 
         return JsonResponse(jsonResp)
 
     def post(self, request, format=None):
-        serializer=ApiSerializer(data=request.data)
+        serializer = ApiSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -128,15 +148,15 @@ class apiList(APIView):
     """
     List all code snippets, or create a new snippet.
     """
-    serializer_class=ApiSerializer
+    serializer_class = ApiSerializer
 
     def get(self, request, format=None):
-        api=ApiModel.objects.all()
-        serializer=ApiSerializer(api, many=True)
+        api = ApiModel.objects.all()
+        serializer = ApiSerializer(api, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
-        serializer=ApiSerializer(data=request.data)
+        serializer = ApiSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -147,7 +167,7 @@ class apiDetail(APIView):
     """
     Retrieve, update or delete a code snippet.
     """
-    serializer_class=ApiSerializer
+    serializer_class = ApiSerializer
 
     def get_object(self, pk):
         try:
@@ -156,20 +176,20 @@ class apiDetail(APIView):
             raise Http404
 
     def get(self, request, pk, format=None):
-        api=self.get_object(pk)
-        serializer=ApiSerializer(api)
+        api = self.get_object(pk)
+        serializer = ApiSerializer(api)
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):
-        api=self.get_object(pk)
-        serializer=ApiSerializer(api, data=request.data)
+        api = self.get_object(pk)
+        serializer = ApiSerializer(api, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
-        api=self.get_object(pk)
+        api = self.get_object(pk)
         api.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -178,15 +198,15 @@ class fieldList(APIView):
     """
     List all code snippets, or create a new snippet.
     """
-    serializer_class=FieldSerializer
+    serializer_class = FieldSerializer
 
     def get(self, request, format=None):
-        field=FieldModel.objects.all()
-        serializer=FieldSerializer(field, many=True)
+        field = FieldModel.objects.all()
+        serializer = FieldSerializer(field, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
-        serializer=FieldSerializer(data=request.data)
+        serializer = FieldSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -197,7 +217,7 @@ class fieldDetail(APIView):
     """
     Retrieve, update or delete a code snippet.
     """
-    serializer_class=FieldSerializer
+    serializer_class = FieldSerializer
 
     def get_object(self, pk):
         try:
@@ -206,20 +226,20 @@ class fieldDetail(APIView):
             raise Http404
 
     def get(self, request, pk, format=None):
-        _field=self.get_object(pk)
-        serializer=FieldSerializer(_field)
+        _field = self.get_object(pk)
+        serializer = FieldSerializer(_field)
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):
-        _field=self.get_object(pk)
-        serializer=FieldSerializer(_field, data=request.data)
+        _field = self.get_object(pk)
+        serializer = FieldSerializer(_field, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
-        _field=self.get_object(pk)
+        _field = self.get_object(pk)
         _field.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -228,15 +248,15 @@ class objList(APIView):
     """
     List all code snippets, or create a new snippet.
     """
-    serializer_class=ObjSerializer
+    serializer_class = ObjSerializer
 
     def get(self, request, format=None):
-        obj=ObjModel.objects.all()
-        serializer=ObjSerializer(obj, many=True)
+        obj = ObjModel.objects.all()
+        serializer = ObjSerializer(obj, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
-        serializer=ObjSerializer(data=request.data)
+        serializer = ObjSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -247,7 +267,7 @@ class objDetail(APIView):
     """
     Retrieve, update or delete a code snippet.
     """
-    serializer_class=ObjSerializer
+    serializer_class = ObjSerializer
 
     def get_object(self, pk):
         try:
@@ -256,19 +276,19 @@ class objDetail(APIView):
             raise Http404
 
     def get(self, request, pk, format=None):
-        _obj=self.get_object(pk)
-        serializer=ObjSerializer(_obj)
+        _obj = self.get_object(pk)
+        serializer = ObjSerializer(_obj)
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):
-        _obj=self.get_object(pk)
-        serializer=ObjSerializer(_obj, data=request.data)
+        _obj = self.get_object(pk)
+        serializer = ObjSerializer(_obj, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
-        _obj=self.get_object(pk)
+        _obj = self.get_object(pk)
         _obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -30,6 +30,8 @@ class ObjModel(models.Model):
     name = models.CharField(max_length=100, unique=True, primary_key=True)
     field = models.ManyToManyField(
         FieldModel, blank=True, verbose_name="list of fields")
+    array = models.BooleanField(default=False)
+    array_length = models.IntegerField(default=10)
 
     def __str__(self):
         return self.name
