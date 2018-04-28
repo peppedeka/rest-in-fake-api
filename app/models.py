@@ -13,7 +13,8 @@ class FieldModel(models.Model):
     name = models.CharField(max_length=100, unique=True, primary_key=True)
     typefield = models.CharField(
         max_length=9, choices=TYPE_OF_FIELD, default='string')
-    required = models.BooleanField()
+    required = models.BooleanField(default=False)
+    array = models.BooleanField(default=False)
     range_start = models.IntegerField()
     range_end = models.IntegerField()
 
@@ -26,8 +27,8 @@ class FieldModel(models.Model):
 
 class ObjModel(models.Model):
     name = models.CharField(max_length=100, unique=True, primary_key=True)
-    field = models.ManyToManyField(FieldModel, verbose_name="list of fields")
-
+    field = models.ManyToManyField(
+        FieldModel, blank=True, verbose_name="list of fields")
 
     def __str__(self):
         return self.name
@@ -38,8 +39,10 @@ class ObjModel(models.Model):
 
 class ApiModel(models.Model):
     name = models.CharField(max_length=100, unique=True, primary_key=True)
-    field = models.ManyToManyField(FieldModel, verbose_name="list of fields")
-    obj = models.ManyToManyField(ObjModel, verbose_name="list of objs")
+    field = models.ManyToManyField(
+        FieldModel, blank=True, verbose_name="list of fields")
+    obj = models.ManyToManyField(
+        ObjModel, blank=True, verbose_name="list of objs")
 
     def __str__(self):
         return self.name
@@ -51,7 +54,8 @@ class ApiModel(models.Model):
 class ProjectModel(models.Model):
     created = models.DateTimeField(default=datetime.now)
     name = models.CharField(max_length=100, unique=True, primary_key=True)
-    api = models.ManyToManyField(ApiModel, verbose_name="list of apis")
+    api = models.ManyToManyField(
+        ApiModel, blank=True, verbose_name="list of apis")
 
     def __str__(self):
         return "%s %s" % (self.name, self.api)

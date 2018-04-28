@@ -245,7 +245,7 @@ class objDetail(APIView):
 
     def put(self, request, pk, format=None):
         _obj = self.get_object(pk)
-        serializer = FieldSerializer(_obj, data=request.data)
+        serializer = ObjSerializer(_obj, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
