@@ -178,7 +178,9 @@ class apiDetail(APIView):
     def get(self, request, pk, format=None):
         api = self.get_object(pk)
         serializer = ApiSerializer(api)
-        return Response(serializer.data)
+        field = list(api.field.values())
+        objs = list(api.obj.values())
+        return JsonResponse({'name': api.name, 'fields': field, 'obj': objs})
 
     def put(self, request, pk, format=None):
         api = self.get_object(pk)
@@ -202,6 +204,26 @@ class fieldList(APIView):
 
     def get(self, request, format=None):
         field = FieldModel.objects.all()
+        serializer = FieldSerializer(field, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = FieldSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class fieldApiList(APIView):
+    """
+    List all code snippets, or create a new snippet.
+    """
+    serializer_class = FieldSerializer
+
+    def get(self, request, pk, format=None):
+        api = ApiModel.objects.get(pk=pk)
+        field = api.field.all()
         serializer = FieldSerializer(field, many=True)
         return Response(serializer.data)
 
@@ -253,6 +275,27 @@ class objList(APIView):
     def get(self, request, format=None):
         obj = ObjModel.objects.all()
         serializer = ObjSerializer(obj, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = ObjSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class objApiList(APIView):
+    """
+    List all code snippets, or create a new snippet.
+    """
+    serializer_class = ObjSerializer
+
+    def get(self, request, pk, format=None):
+        api = ApiModel.objects.get(pk=pk)
+        objs = api.obj.all()
+
+        serializer = ObjSerializer(objs, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):

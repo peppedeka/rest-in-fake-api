@@ -26,6 +26,10 @@ urlpatterns.append(
     url(r'^field/(?P<pk>[a-z0-9]+)/$', views.fieldDetail.as_view()),)
 urlpatterns.append(url(r'^obj/$', views.objList.as_view()))
 urlpatterns.append(
-    url(r'^obj/(?P<pk>[a-z0-9]+)/$', views.objDetail.as_view()),)
+    url(r'^obj/(?P<pk>[a-z0-9\-]+)/$', views.objDetail.as_view()),)
+urlpatterns.append(
+    url(r'^objs/(?P<pk>[a-z0-9\-]+)/$', views.objApiList.as_view()),)
+urlpatterns.append(
+    url(r'^fields/(?P<pk>[a-z0-9\-]+)/$', views.fieldApiList.as_view()),)
 
 urlpatterns = format_suffix_patterns(urlpatterns)
