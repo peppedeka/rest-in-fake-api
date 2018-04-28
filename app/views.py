@@ -45,8 +45,13 @@ class projectDetail(APIView):
 
     def get(self, request, pk, format=None):
         project = self.get_object(pk)
-        serializer = ProjectSerializer(project)
-        return Response(serializer.data)
+        apis = []
+        for api in project.api.all():
+            field = list(api.field.values())
+            objs = list(api.obj.values())
+            apis.append({'api': api.name, 'field': field, 'obj': objs})
+
+        return JsonResponse({project.name: apis})
 
     def put(self, request, pk, format=None):
         project = self.get_object(pk)
