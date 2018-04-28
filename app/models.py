@@ -15,11 +15,12 @@ class FieldModel(models.Model):
         max_length=9, choices=TYPE_OF_FIELD, default='string')
     required = models.BooleanField(default=False)
     array = models.BooleanField(default=False)
+    array_length = models.IntegerField(default=10)
     range_start = models.IntegerField()
     range_end = models.IntegerField()
 
     def __str__(self):
-        return "%s %s %s %s %s" % (self.name, self.typefield, self.required, self.range_start, self.range_end)
+        return self.name
 
     class Meta:
         ordering = ('name',)
@@ -51,6 +52,8 @@ class ApiModel(models.Model):
         ordering = ('name',)
 
 
+    """ddd
+     """
 class ProjectModel(models.Model):
     created = models.DateTimeField(default=datetime.now)
     name = models.CharField(max_length=100, unique=True, primary_key=True)
