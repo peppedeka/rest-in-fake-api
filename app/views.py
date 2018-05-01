@@ -38,13 +38,33 @@ class projectVerboseDetail(APIView):
         except ProjectModel.DoesNotExist:
             raise Http404
 
+    def get_field(self, pk):
+        try:
+            return FieldModel.objects.get(pk=pk)
+        except FieldModel.DoesNotExist:
+            raise Http404
+    def get_obj(self, pk):
+        try:
+            return ObjectModel.objects.get(pk=pk)
+        except ObjectModel.DoesNotExist:
+            raise Http404
+
     def get(self, request, pk, format=None):
         project = self.get_object(pk)
         apis = []
         for api in project.api.all():
             field = list(api.field.values())
-            objs = list(api.obj.values())
-            apis.append({'api': api.name, 'field': field, 'obj': objs})
+            _objList = []
+            for _obj in list(api.obj.all()):
+                currentObj = {
+                    'name': _obj.name,
+                    'array': _obj.array,
+                    'array_length': _obj.array_length,
+                    'fields': list(_obj.field.values())
+                }
+                _objList.append(currentObj)
+
+            apis.append({'api': api.name, 'field': field, 'obj': _objList})
         return JsonResponse({project.name: apis})
 
 
@@ -139,6 +159,7 @@ class apiOfProjectList(APIView):
                     jsonFromObjArray.append(jsonFromObj)
                 jsonResp.update({obj.name: jsonFromObjArray})
             else:
+                jsonFromObj = {}
                 for fld_obj in obj.field.all():
                     if fld_obj.typefield == 'int':
                         jsonFromObj.update({fld_obj.name: randint(
